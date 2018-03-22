@@ -8,9 +8,6 @@
     },
     "/api/*": {
       "target": "http://localhost:2000"
-    },
-    "hello": {
-      "target": "http://localhost:2000"
     }
   },
   "dependencies": {
