@@ -6,6 +6,6 @@ jobs:
     steps:
       - checkout
       - run:
-        name: decode-gcloud-key
-        command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+          name: decode-gcloud-key
+          command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
 
