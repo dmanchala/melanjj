@@ -14,5 +14,10 @@ jobs:
       # - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
       # - run: gcloud config set project melanjj-prod
       # - run: gcloud app deploy
-
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build:
+        context: melanjj
           
