@@ -5,7 +5,7 @@ jobs:
       - image:  google/cloud-sdk
     steps:
       - checkout
-      - run: echo "env_variables" >> app.yaml
+      - run: echo "env_variables:" >> app.yaml
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
       - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
