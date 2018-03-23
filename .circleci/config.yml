@@ -9,6 +9,7 @@ jobs:
       - run: echo "  GOOGLE_CLIENT_ID:\"$GOOGLE_CLIENT_ID\"" >> app.yaml
       - run: echo "  GOOGLE_CLIENT_SECRET:\"$GOOGLE_CLIENT_SECRET\"" >> app.yaml
       - run: echo "  MONGO_URI:\"$MONGO_URI\"" >> app.yaml
+      - run: circleci config validate -c app.yaml
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
       - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
