@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: decode-gcloud-key
-          command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb
+          command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
       - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
       - run: gcloud config set project melanjj-prod
