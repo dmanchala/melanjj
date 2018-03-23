@@ -5,10 +5,10 @@ jobs:
       - image:  google/cloud-sdk
     steps:
       - checkout
-      - run: echo -e "env_variables:\n" >> app.yaml
-      - run: echo -e "  GOOGLE_CLIENT_ID:\"$GOOGLE_CLIENT_ID\"\n" >> app.yaml
-      - run: echo -e "  GOOGLE_CLIENT_SECRET:\"$GOOGLE_CLIENT_SECRET\"\n" >> app.yaml
-      - run: echo -e "  MONGO_URI:\"$MONGO_URI\"\n" >> app.yaml
+      - run: echo "env_variables:" >> app.yaml
+      - run: echo "  GOOGLE_CLIENT_ID:\"$GOOGLE_CLIENT_ID\"" >> app.yaml
+      - run: echo "  GOOGLE_CLIENT_SECRET:\"$GOOGLE_CLIENT_SECRET\"" >> app.yaml
+      - run: echo "  MONGO_URI:\"$MONGO_URI\"" >> app.yaml
       - run: echo "env_variables:" >> app.yaml
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
