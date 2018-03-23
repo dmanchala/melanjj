@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
       - run: echo "env_variables:" >> app.yaml
-      - run: echo "  GOOGLE_CLIENT_ID: $GOOGLE_CLIENT_ID" >> app.yaml
+      - run: echo "  GOOGLE_CLIENT_ID:$GOOGLE_CLIENT_ID" >> app.yaml
       - run: echo "env_variables:" >> app.yaml
       # - run: echo "env_variables:" >> app.yaml
       # - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
