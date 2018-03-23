@@ -1,11 +1,22 @@
+# version: 2
+# jobs:
+#   build:
+#     docker:
+#       - image: circleci/node:9.5.0
+#     steps:
+#       - checkout
+#       - run:
+#           name: decode-gcloud-key
+#           command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+
 version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:9.5.0
+      - image: circleci/node:4.8.2
+      - image: mongo:3.4.4
     steps:
       - checkout
       - run:
-          name: decode-gcloud-key
-          command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
-
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
