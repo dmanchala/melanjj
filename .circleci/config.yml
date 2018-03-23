@@ -1,14 +1,3 @@
-# version: 2
-# jobs:
-#   build:
-#     docker:
-#       - image: circleci/node:9.5.0
-#     steps:
-#       - checkout
-#       - run:
-#           name: decode-gcloud-key
-#           command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
-
 version: 2
 jobs:
   build:
@@ -16,4 +5,6 @@ jobs:
       - image: circleci/node:9.5.0
     steps:
       - checkout
-      - run: echo "test echo"
+      - run:
+          name: decode-gcloud-key
+          command: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
