@@ -13,11 +13,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:4.8.2
-      - image: mongo:3.4.4
+      - image: circleci/node:9.5.0
     steps:
       - checkout
-      - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@latest'
-      - echo "test echo"
+      - run: echo "test echo"
