@@ -33,8 +33,8 @@ passport.use(
       }
 
       const newUser = await User({ email }).save();
-      await notifyAdminOfSignup({ email });
-      done(null, newUser);
+      const err = await notifyAdminOfSignup(newUser);
+      done(err, newUser);
     },
   ),
 );

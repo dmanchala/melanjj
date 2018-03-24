@@ -1,4 +1,8 @@
 const passport = require('passport');
+const mongoose = require('mongoose');
+const requireAdmin = require('../middlewares/requireAdmin');
+
+const User = mongoose.model('users');
 
 module.exports = (app) => {
   app.get(
@@ -23,5 +27,12 @@ module.exports = (app) => {
 
   app.get('/api/current_user', (req, res) => {
     res.send(req.user);
+  });
+
+  app.get('/api/admin/users/:id/approve', requireAdmin, async (req, res) => {
+    const user = await User.findById(req.params.id);
+    user.approved = true;
+    await user.save();
+    res.send(user);
   });
 };

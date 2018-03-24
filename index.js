@@ -23,6 +23,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 require('./routes/authRoutes')(app);
+require('./query/graphqlRoutes')(app);
 
 const PORT = process.env.PORT || 2000;
 app.listen(PORT);

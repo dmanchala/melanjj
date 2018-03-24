@@ -19,6 +19,12 @@ jobs:
       - run: printf " \"$GOOGLE_CLIENT_SECRET\"\n" >> app.yaml
       - run: printf "  MONGO_URI:" >> app.yaml
       - run: printf " \"$MONGO_URI\"\n" >> app.yaml
+      - run: printf "  COOKIE_KEY:" >> app.yaml
+      - run: printf " \"$COOKIE_KEY\"\n" >> app.yaml
+      - run: printf "  REDIRECT_DOMAIN:" >> app.yaml
+      - run: printf " \"$REDIRECT_DOMAIN\"\n" >> app.yaml
+      - run: printf "  SENDGRID_KEY:" >> app.yaml
+      - run: printf " \"$SENDGRID_KEY\"\n" >> app.yaml
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
       - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
