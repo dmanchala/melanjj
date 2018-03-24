@@ -2,8 +2,17 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 const keys = require('../config/keys');
+const notifyAdminOfSignup = require('./notifyAdminOfSignup');
 
 const User = mongoose.model('users');
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  done(null, await User.findById(id));
+});
 
 passport.use(
   new GoogleStrategy(
@@ -24,6 +33,7 @@ passport.use(
       }
 
       const newUser = await User({ email }).save();
+      await notifyAdminOfSignup({ email });
       done(null, newUser);
     },
   ),
