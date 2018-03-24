@@ -32,9 +32,17 @@ passport.use(
         return;
       }
 
-      const newUser = await User({ email }).save();
+      const newUser = await User({ email });
+
       const err = await notifyAdminOfSignup(newUser);
-      done(err, newUser);
+
+      if (err) {
+        done(err, newUser);
+        return;
+      }
+
+      newUser.save();
+      done(null, newUser);
     },
   ),
 );
