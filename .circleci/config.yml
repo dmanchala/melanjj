@@ -12,12 +12,13 @@ jobs:
       - image: circleci/node:9.5.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project
       - run: npm install --prefix client 
       - run: npm run build --prefix client
-      - run: mkdir -p workspace
-      - run: zip -r workspace/build.zip ~/project/client/build
+      - run: zip -r ~/project/build.zip ~/project/client/build
       - persist_to_workspace:
-          root: workspace
+          root: .
           path: build.zip
   deploy:
     docker:
