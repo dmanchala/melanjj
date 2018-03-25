@@ -1,5 +1,6 @@
 const passport = require('passport');
 const mongoose = require('mongoose');
+const keys = require('../config/keys');
 const requireAdmin = require('../middlewares/requireAdmin');
 
 const User = mongoose.model('users');
@@ -16,7 +17,7 @@ module.exports = (app) => {
     '/auth/google/callback',
     passport.authenticate('google'),
     (req, res) => {
-      res.redirect('/');
+      res.redirect(`${keys.redirectDomain}/`);
     },
   );
 
