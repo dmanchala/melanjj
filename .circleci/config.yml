@@ -8,16 +8,18 @@ jobs:
       - run: npm install
       - run: npm run test
   build-prod-react-app:
+    working_directory: /tmp
     docker:
       - image: circleci/node:9.5.0
     steps:
       - checkout
       - run: npm install --prefix client 
       - run: npm run build --prefix client
-      - run: zip -r ~/project/build.zip ~/project/client/build
+      - run: mkdir -p workspace
+      - run: zip -r workspace/build.zip ~/project/client/build
       - persist_to_workspace:
-          root: ~/
-          path: "project/build.zip"
+          root: workspace
+          path: build.zip
   deploy:
     docker:
       - image:  google/cloud-sdk
