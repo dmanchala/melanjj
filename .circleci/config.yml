@@ -26,6 +26,7 @@ jobs:
 # retrieve previously built production react app
       - attach_workspace:
           at: ~/project/client
+      - run: ls client
 # write production environment variables to app.yaml
       - run: printf "env_variables:\n" >> app.yaml
       - run: printf "  GOOGLE_CLIENT_ID:" >> app.yaml
