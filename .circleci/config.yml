@@ -7,14 +7,23 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run test
+  build-prod-react-app:
+    docker:
+      - image: circleci/node:9.5.0
+    steps:
+      - run: npm install --prefix client 
+      - run: npm run build --prefix client
+      - persist_to_workspace:
+          root: client/build
   deploy:
     docker:
       - image:  google/cloud-sdk
     steps:
       - checkout
-# build production react app
-      - run: npm install --prefix client 
-      - run: npm run build --prefix client
+# retrieve previously built production react app
+      - run: mkdir client/build
+      - attach_workspace:
+          at: client/build
 # write production environment variables to app.yaml
       - run: printf "env_variables:\n" >> app.yaml
       - run: printf "  GOOGLE_CLIENT_ID:" >> app.yaml
@@ -40,9 +49,11 @@ workflows:
   test-and-deploy: 
     jobs:
       - test
+      - build-prod-react-app
       - deploy:
           requires:
             - test
+            - build-prod-react-app
           filters:
             branches:
               only:
