@@ -16,8 +16,8 @@ jobs:
       - run: npm run build --prefix client
       - run: zip -r ~/project/build.zip ~/project/client/build
       - persist_to_workspace:
-          root: ~/project
-          path: "build.zip"
+          root: ~/
+          path: "project/build.zip"
   deploy:
     docker:
       - image:  google/cloud-sdk
