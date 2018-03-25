@@ -17,7 +17,7 @@ jobs:
       - run: ls client
       - persist_to_workspace:
           root: ~/project/client
-          path: build
+          path: package.json
   deploy:
     docker:
       - image:  google/cloud-sdk
