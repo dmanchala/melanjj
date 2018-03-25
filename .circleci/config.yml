@@ -11,6 +11,7 @@ jobs:
     docker:
       - image: circleci/node:9.5.0
     steps:
+      - checkout
       - run: npm install --prefix client 
       - run: npm run build --prefix client
       - persist_to_workspace:
