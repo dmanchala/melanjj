@@ -14,9 +14,10 @@ jobs:
       - checkout
       - run: npm install --prefix client 
       - run: npm run build --prefix client
+      - run: zip -r ~/project/build.zip ~/project/client/build
       - persist_to_workspace:
-          root: client
-          path: build
+          root: ~/project
+          path: build.zip
   deploy:
     docker:
       - image:  google/cloud-sdk
@@ -24,7 +25,8 @@ jobs:
       - checkout
 # retrieve previously built production react app
       - attach_workspace:
-          at: client
+          at: ~/project
+      - run: unzip ~/project/build.zip -d /
 # write production environment variables to app.yaml
       - run: printf "env_variables:\n" >> app.yaml
       - run: printf "  GOOGLE_CLIENT_ID:" >> app.yaml
