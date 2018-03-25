@@ -14,10 +14,10 @@ jobs:
       - checkout
       - run: npm install --prefix client 
       - run: npm run build --prefix client
-      - run: ls client
       - persist_to_workspace:
           root: ~/project/client
-          path: package.json
+          paths: 
+            - build
   deploy:
     docker:
       - image:  google/cloud-sdk
