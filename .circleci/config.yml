@@ -12,14 +12,11 @@ jobs:
       - image: circleci/node:9.5.0
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
       - run: npm install --prefix client 
       - run: npm run build --prefix client
-      - run: zip -r ~/project/build.zip ~/project/client/build
       - persist_to_workspace:
-          root: .
-          path: build.zip
+          root: ~/project/client
+          path: build
   deploy:
     docker:
       - image:  google/cloud-sdk
@@ -27,8 +24,7 @@ jobs:
       - checkout
 # retrieve previously built production react app
       - attach_workspace:
-          at: ~/project
-      - run: unzip ~/project/build.zip -d /
+          at: ~/project/client
 # write production environment variables to app.yaml
       - run: printf "env_variables:\n" >> app.yaml
       - run: printf "  GOOGLE_CLIENT_ID:" >> app.yaml
