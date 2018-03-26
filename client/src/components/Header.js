@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Menu, Layout } from 'antd';
 
 const { Item } = Menu;
 
 class Header extends Component {
   /* eslint class-methods-use-this: 0 */
-  renderOptions() {
-    return [
-      <Item key="2">Million Song Dataset</Item>,
-      <Item key="3">Log In</Item>,
-      <Item key="4">Sign Up</Item>,
-    ];
+  renderAuthOptions() {
+    switch (this.props.auth) {
+      case null:
+        return null;
+      case false:
+        return [<Item key="3">Log In</Item>, <Item key="4">Sign Up</Item>];
+      default:
+        return <Item key="4">Log Out</Item>;
+    }
   }
 
   render() {
@@ -20,11 +24,16 @@ class Header extends Component {
           <Item key="1" style={{ fontSize: 'xx-large' }}>
             Melanjj
           </Item>
-          {this.renderOptions()}
+          <Item key="2">Million Song Dataset</Item>
+          {this.renderAuthOptions()}
         </Menu>
       </Layout.Header>
     );
   }
 }
 
-export default Header;
+function mapStateToProps({ auth }) {
+  return { auth };
+}
+
+export default connect(mapStateToProps)(Header);
