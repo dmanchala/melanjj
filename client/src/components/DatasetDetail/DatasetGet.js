@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, Button, Dropdown, Icon, Menu, Input, Col, Row } from 'antd';
+import { Card, Dropdown, Icon, Menu, Col, Row } from 'antd';
 
-const { TextArea } = Input;
+import DatasetQuery from './DatasetQuery';
 
 const menu = (
   <Menu>
@@ -15,11 +15,7 @@ const DatasetGet = () => (
   <div style={{ padding: 10 }}>
     <Row gutter={1}>
       <Col span={8}>
-        <Card cover={<TextArea rows={20} />}>
-          <Button size="large" style={{ width: '100%', margin: '0 auto;' }}>
-            Run
-          </Button>
-        </Card>
+        <DatasetQuery />
       </Col>
       <Col span={8}>
         <Card title="Help">
@@ -36,9 +32,9 @@ const DatasetGet = () => (
         <Card title="Collections">
           <Card bordered={false}>
             <Dropdown overlay={menu}>
-              <a className="ant-dropdown-link" href="#">
+              <div className="ant-dropdown-link">
                 Collection Picker <Icon type="down" />
-              </a>
+              </div>
             </Dropdown>
           </Card>
           <Card title="Summary" bordered={false}>
