@@ -1,16 +1,19 @@
-import React, { Component } from 'react';
-import { Button } from 'antd';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
 
-/* eslint react/prefer-stateless-function: 0 */
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <Button type="primary">Button</Button>
+import Header from './components/Header';
+import Landing from './components/Landing';
+import DatasetDetail from './components/DatasetDetail';
+import SignupThankYOu from './components/SignupThankYou';
+
+const App = () => (
+  <div>
+    <BrowserRouter>
+      <div>
+        <Route path="/" component={Landing} />
       </div>
-    );
-  }
-}
+    </BrowserRouter>
+  </div>
+);
 
 export default App;
