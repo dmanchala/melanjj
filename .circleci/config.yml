@@ -52,6 +52,10 @@ workflows:
     jobs:
       - test
       - build-prod-react-app
+        filters:
+          branches:
+            only:
+              - master
       - deploy:
           requires:
             - test

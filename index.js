@@ -3,6 +3,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const keys = require('./config/keys');
 require('./models/User');
 require('./services/passport');
@@ -12,6 +13,7 @@ mongoose.connect(keys.mongoUri);
 const app = express();
 
 app.use(bodyParser.json());
+app.use(morgan('tiny'));
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,

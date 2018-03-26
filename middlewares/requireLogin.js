@@ -1,13 +1,12 @@
 module.exports = (req, res, next) => {
   if (!req.user) {
-    return res.redirect('/auth/google');
+    res.redirect('/auth/google');
+    return;
   }
   if (!req.user.approved) {
-    return res.send(
-      "Thank you for having signed up. We'll approve you shortly and notify you by email.",
-    );
+    res.redirect('/api/signup/thank_you');
+    return;
   }
 
   next();
-  return undefined;
 };

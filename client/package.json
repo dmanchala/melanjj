@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": {
-    "/auth/google": {
+    "/auth/*": {
       "target": "http://localhost:2000"
     },
     "/api/*": {
@@ -11,13 +11,15 @@
     }
   },
   "dependencies": {
+    "ajv": "^6.4.0",
+    "antd": "^3.3.3",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.1"
   },
   "scripts": {
-    "start": "PORT=2999 react-scripts start",
-    "build": "react-scripts build",
+    "start": "PORT=2999 react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "mocha",
     "eject": "react-scripts eject"
   },
