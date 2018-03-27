@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
     return;
   }
   if (!req.user.approved) {
-    res.redirect('/api/signup/thank_you');
+    res.redirect('/signup-thank-you');
     return;
   }
 

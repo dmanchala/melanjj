@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Card, Button, Input, Form } from 'antd';
 import axios from 'axios';
+import * as actions from '../../actions';
 
 const { TextArea } = Input;
 
@@ -34,6 +35,10 @@ class DatasetQuery extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.fetchUser();
   }
 
   handleChange(event) {
@@ -85,4 +90,4 @@ function mapStateToProps({ auth }) {
   return { auth };
 }
 
-export default connect(mapStateToProps)(Form.create()(DatasetQuery));
+export default connect(mapStateToProps, actions)(Form.create()(DatasetQuery));
