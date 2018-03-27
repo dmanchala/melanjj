@@ -33,7 +33,7 @@ module.exports = (app) => {
     res.send(req.user);
   });
 
-  app.get('/api/signup/thank_you', (req, res) => {
+  app.get('/signup-thank-you', (req, res) => {
     res.send(
       "Thank you for signing up. We'll email you when your account is ready.",
     );

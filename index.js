@@ -13,7 +13,11 @@ mongoose.connect(keys.mongoUri);
 const app = express();
 
 app.use(bodyParser.json());
-app.use(morgan('tiny'));
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('tiny'));
+}
+
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,
