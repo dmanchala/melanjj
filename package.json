@@ -8,12 +8,11 @@
   },
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon index.js",
+    "server": "nodemon --inspect=12345 index.js",
     "server-test": "mocha",
     "client": "npm run start --prefix client",
     "client-test": "npm run test --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "dev-debug": "concurrently \"node --inspect=12345 index.js\" \"npm run client\"",
     "test": "npm run server-test && npm run client-test"
   },
   "repository": {

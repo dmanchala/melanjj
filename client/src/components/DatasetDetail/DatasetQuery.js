@@ -1,55 +1,82 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Input } from 'antd';
+import { Card, Button, Input, Form } from 'antd';
+import axios from 'axios';
 
 const { TextArea } = Input;
 
 /* eslint react/prefer-stateless-function: 0 */
-class DatasetQuery extends Component {
-  render() {
-    let content;
 
+const SignUpLogInContent = () => [
+  <div style={{ marginBottom: 10 }}>
+    Please sign up or log in to query this dataset.
+  </div>,
+  <div>
+    <Button size="large">
+      <a href="/auth/google">Log In</a>
+    </Button>
+    <Button size="large" style={{ marginLeft: 10 }}>
+      <a href="/auth/google">Sign Up</a>
+    </Button>
+  </div>,
+];
+
+const AccountNotApprovedText = () => (
+  <div>
+    Thanks for signing up. We&apos;ll email you once your account is activated.
+  </div>
+);
+
+class DatasetQuery extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { query: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({ query: event.target.value });
+  }
+
+  async handleSubmit(event) {
+    event.preventDefault();
+    await axios.post('/api/graphql', { query: this.state.query });
+  }
+
+  render() {
+    const textArea = (
+      <TextArea
+        type="text"
+        rows={20}
+        value={this.state.query}
+        onChange={this.handleChange}
+        disabled={!this.props.auth || !this.props.auth.approved}
+      />
+    );
+    let content;
     if (this.props.auth && this.props.auth.approved) {
       content = (
-        <Button size="large" style={{ width: '100%', margin: '0 auto;' }}>
+        <Button
+          size="large"
+          style={{ width: '100%', margin: '0 auto' }}
+          htmlType="submit"
+        >
           Run
         </Button>
       );
     } else if (this.props.auth) {
-      content = (
-        <div>
-          Thanks for signing up. We&apos;ll email you once your account is
-          activated.
-        </div>
-      );
+      content = <AccountNotApprovedText />;
     } else if (this.props.auth === false) {
-      content = [
-        <div style={{ marginBottom: 10 }}>
-          Please sign up or log in to query this dataset.
-        </div>,
-        <div>
-          <Button size="large">
-            <a href="/auth/google">Log In</a>
-          </Button>
-          <Button size="large" style={{ marginLeft: 10 }}>
-            <a href="/auth/google">Sign Up</a>
-          </Button>
-        </div>,
-      ];
+      content = SignUpLogInContent();
     } else if (this.props.auth === null) {
       content = null;
     }
     return (
-      <Card
-        cover={
-          <TextArea
-            rows={20}
-            disabled={!this.props.auth || !this.props.auth.approved}
-          />
-        }
-      >
-        {content}
-      </Card>
+      <Form onSubmit={this.handleSubmit}>
+        <Card cover={textArea}>{content}</Card>
+      </Form>
     );
   }
 }
@@ -58,4 +85,4 @@ function mapStateToProps({ auth }) {
   return { auth };
 }
 
-export default connect(mapStateToProps)(DatasetQuery);
+export default connect(mapStateToProps)(Form.create()(DatasetQuery));
