@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Landing from './components/Landing';
 import DatasetDetail from './components/DatasetDetail/DatasetDetail';
 import SignupThankYou from './components/SignupThankYou';
+import DatasetGet from './components/DatasetDetail/DatasetGet';
 
 class App extends Component {
   componentDidMount() {
@@ -22,8 +23,8 @@ class App extends Component {
           <Route exact path="/" component={Landing} />
           <Route
             exact
-            path="/datasets/melanjj/million-song-dataset"
-            component={DatasetDetail}
+            path="/datasets/melanjj/:dataset"
+            component={DatasetGet}
           />
           <Route exact path="/signup-thank-you" component={SignupThankYou} />
         </Layout>

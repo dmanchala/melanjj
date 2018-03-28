@@ -33,7 +33,7 @@ class Header extends Component {
       <Layout.Header className="header">
         <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
           <Item key="1" style={{ fontSize: 'xx-large' }}>
-            Melanjj
+            <Link to="/">Melanjj</Link>
           </Item>
           <Item key="2">
             <Link to="/datasets/melanjj/million-song-dataset">
