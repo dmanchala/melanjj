@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Dropdown, Icon, Menu, Col, Row } from 'antd';
+import { Card, Menu, Col, Row } from 'antd';
 import axios from 'axios';
 
 import DatasetQuery from './DatasetQuery';

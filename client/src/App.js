@@ -6,7 +6,6 @@ import * as actions from './actions';
 import './App.css';
 import Header from './components/Header';
 import Landing from './components/Landing';
-import DatasetDetail from './components/DatasetDetail/DatasetDetail';
 import SignupThankYou from './components/SignupThankYou';
 import DatasetGet from './components/DatasetDetail/DatasetGet';
 
