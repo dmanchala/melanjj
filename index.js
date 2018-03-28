@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const keys = require('./config/keys');
 require('./models/User');
+require('./models/Dataset');
 require('./services/passport');
 
 mongoose.connect(keys.mongoUri);
@@ -29,6 +30,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 require('./routes/authRoutes')(app);
+require('./query/datasetMetadataRoutes')(app);
 require('./query/graphqlRoutes')(app);
 
 app.use('/api', express.static('static'));
