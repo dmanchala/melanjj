@@ -31,6 +31,8 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./query/graphqlRoutes')(app);
 
+app.use('/api', express.static('static'));
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));
 

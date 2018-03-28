@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Dropdown, Icon, Menu, Col, Row } from 'antd';
+import axios from 'axios';
 
 import DatasetQuery from './DatasetQuery';
 
@@ -12,8 +13,11 @@ const menu = (
 );
 
 class DatasetGet extends Component {
-  componentDidMount() {
+  async componentDidMount() {
     this.dataset = this.props.match.params.dataset;
+    const response = await axios.get(`/api/${this.dataset}/desc.html`);
+    const desc = response.data;
+    console.log(desc);
   }
 
   render() {
