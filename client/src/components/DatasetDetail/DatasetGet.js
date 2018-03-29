@@ -32,7 +32,6 @@ class DatasetAbout extends Component {
   async componentWillMount() {
     const res = await axios.get(`/api/datasets/melanjj/${this.props.dataset}`);
     this.setState({ dataset: res.data });
-    console.log(res.data);
   }
 
   onTabChange = (key) => {

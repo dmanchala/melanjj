@@ -40,6 +40,8 @@ jobs:
       - run: printf " \"$REDIRECT_DOMAIN\"\n" >> app.yaml
       - run: printf "  SENDGRID_KEY:" >> app.yaml
       - run: printf " \"$SENDGRID_KEY\"\n" >> app.yaml
+      - run: printf "  GOOGLE_CLOUD_PROJECT_ID:" >> app.yaml
+      - run: printf " \"$GOOGLE_CLOUD_PROJECT_ID\"\n" >> app.yaml
 # deploy to google app engine
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk

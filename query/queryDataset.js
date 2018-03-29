@@ -1,13 +1,8 @@
-const requireLogin = require('../middlewares/requireLogin');
-const constants = require('../full_stack/constants');
+const mongoose = require('mongoose');
+const c = require('../full_stack/constants');
 
-const { USER_MONTHLY_BANDWIDTH_QUOTA_IN_BYTES } = constants;
-
-module.exports = (app) => {
-  app.post('/api/graphql', requireLogin, (req, res) => {
-    console.log(req);
-
-    /*
+const User = mongoose.model('users');
+/*
     !!!! Database access must be read only !!!!
     !!!! Refactor so that BigQuery service can be mocked and the rest of the code can be unit tested !!!!
     if user has exceeded their bandwidth quota, block them
@@ -46,5 +41,33 @@ module.exports = (app) => {
     stream csv writer into response
     end response
     */
-  });
+
+module.exports = (getDataFromBigQuery) => async (req, res) => {
+  if (
+    req.user.bandwidthInBytesConsumedThisMonth >
+    c.USER_MONTHLY_BANDWIDTH_QUOTA_IN_BYTES
+  ) {
+    res.status(403).send(c.errorStrings.BANDWIDTH_QUOTA_EXCEEDED);
+    return;
+  } else if (req.user.apiRequestsMadeToday > c.USER_DAILY_API_REQUEST_LIMIT) {
+    res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
+    return;
+  }
+
+  req.user.apiRequestsMadeToday += 1;
+  await req.user.save();
+
+  getDataFromBigQuery(
+    req,
+    res,
+    (error) => {
+      res.status(error.code).send(error.message);
+    },
+    (row) => {
+      console.log(row);
+    },
+    () => {
+      console.log('done');
+    },
+  );
 };

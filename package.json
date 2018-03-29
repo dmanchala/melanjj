@@ -9,11 +9,13 @@
   "scripts": {
     "start": "node index.js",
     "server": "nodemon --inspect=12345 index.js",
-    "server-test": "mocha",
+    "server-test": "mocha --timeout 10000 --exit",
     "client": "npm run start --prefix client",
     "client-test": "npm run test --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "test": "npm run server-test && npm run client-test"
+    "kill-zombie": "lsof -t -i tcp:12345 | xargs kill",
+    "kill-zombie-test": "lsof -t -i tcp:2000 | xargs kill",
+    "dev": "npm run kill-zombie && concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "test": "npm run kill-zombie-test && npm run server-test && npm run client-test"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
   },
   "homepage": "https://github.com/dmanchala/melanjj#readme",
   "dependencies": {
+    "@google-cloud/bigquery": "^1.0.0",
     "@sendgrid/mail": "^6.2.1",
     "body-parser": "^1.18.2",
     "cookie-session": "^2.0.0-beta.3",
@@ -37,6 +40,8 @@
   "devDependencies": {
     "babel-eslint": "^8.2.2",
     "babel-plugin-import": "^1.6.7",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
     "concurrently": "^3.5.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
@@ -44,6 +49,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "mocha": "^5.0.5",
+    "mock-express-response": "^0.2.2",
     "morgan": "^1.9.0",
     "nodemon": "^1.17.2"
   }

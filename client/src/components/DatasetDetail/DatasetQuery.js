@@ -47,7 +47,11 @@ class DatasetQuery extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    await axios.post('/api/graphql', { query: this.state.query });
+    const { err, res } = await axios.post('/api/queryDataset', {
+      query: this.state.query,
+    });
+    console.log(err);
+    console.log(res);
   }
 
   render() {
