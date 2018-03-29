@@ -43,19 +43,22 @@ const User = mongoose.model('users');
     */
 
 module.exports = (getDataFromBigQuery) => async (req, res) => {
+  req.user.apiRequestsMadeToday += 1;
+  await req.user.save();
+
   if (
-    req.user.bandwidthInBytesConsumedThisMonth >
+    req.user.bandwidthInBytesConsumedThisMonth >=
     c.USER_MONTHLY_BANDWIDTH_QUOTA_IN_BYTES
   ) {
     res.status(403).send(c.errorStrings.BANDWIDTH_QUOTA_EXCEEDED);
     return;
-  } else if (req.user.apiRequestsMadeToday > c.USER_DAILY_API_REQUEST_LIMIT) {
+  } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
     res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
     return;
+  } else if (!req.body.query) {
+    res.status(400).send(c.errorStrings.EMPTY_QUERY);
+    return;
   }
-
-  req.user.apiRequestsMadeToday += 1;
-  await req.user.save();
 
   getDataFromBigQuery(
     req,

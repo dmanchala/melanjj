@@ -12,12 +12,32 @@ const bigquery = new BigQuery({
   ),
 });
 
-// 'SELECT url FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
+// 'SELECT * FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
 
-module.exports = (req, res, errorCallback, dataCallback, doneCallback) => {
-  bigquery
-    .createQueryStream(req.body.query)
-    .on('error', errorCallback)
-    .on('data', dataCallback)
-    .on('end', doneCallback);
+module.exports = async (
+  req,
+  res,
+  errorCallback,
+  dataCallback,
+  doneCallback,
+) => {
+  const data = await bigquery.createQueryJob({
+    query: req.body.query,
+    dryRun: true,
+  });
+  const job = data[0];
+  job.getQueryResults((err, rows) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(rows);
+  });
+  // .createQueryStream({ query: req.body.query, dryRun: true })
+  // .on('error', (error) => {
+  //   console.log(error.code, error.message);
+  //   res.status(error.code).send(error.message);
+  // })
+  // .on('data', dataCallback)
+  // .on('end', doneCallback);
 };

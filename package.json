@@ -8,14 +8,14 @@
   },
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon --inspect=12345 index.js",
+    "server": "nodemon index.js",
     "server-test": "mocha --timeout 10000 --exit",
     "client": "npm run start --prefix client",
     "client-test": "npm run test --prefix client",
-    "kill-zombie": "lsof -t -i tcp:12345 | xargs kill",
-    "kill-zombie-test": "lsof -t -i tcp:2000 | xargs kill",
-    "dev": "npm run kill-zombie && concurrently --kill-others \"npm run server\" \"npm run client\"",
-    "test": "npm run kill-zombie-test && npm run server-test && npm run client-test"
+    "kill-zombie": "lsof -t -i tcp:2000 | xargs kill",
+    "dev":
+      "npm run kill-zombie && concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "test": "npm run kill-zombie && npm run server-test && npm run client-test"
   },
   "repository": {
     "type": "git",
