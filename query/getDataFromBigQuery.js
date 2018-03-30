@@ -1,5 +1,10 @@
+/* eslint func-names: 0 */
+/* eslint space-before-function-paren: 0 */
+
 const BigQuery = require('@google-cloud/bigquery');
 const path = require('path');
+const through2 = require('through2');
+const fs = require('fs');
 const keys = require('../config/keys');
 
 const bigquery = new BigQuery({
@@ -12,32 +17,25 @@ const bigquery = new BigQuery({
   ),
 });
 
-// 'SELECT * FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
+// 'SELECT url FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
+
+// const bigQueryDryRun = async (query) => {
+//   await
+// }
 
 module.exports = async (
   req,
   res,
+  dryRunCallback,
   errorCallback,
   dataCallback,
   doneCallback,
 ) => {
-  const data = await bigquery.createQueryJob({
-    query: req.body.query,
-    dryRun: true,
-  });
-  const job = data[0];
-  job.getQueryResults((err, rows) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    console.log(rows);
-  });
-  // .createQueryStream({ query: req.body.query, dryRun: true })
-  // .on('error', (error) => {
-  //   console.log(error.code, error.message);
-  //   res.status(error.code).send(error.message);
-  // })
-  // .on('data', dataCallback)
-  // .on('end', doneCallback);
+  await bigquery.createQueryJob(
+    {
+      query: req.body.query,
+      dryRun: true,
+    },
+    dryRunCallback,
+  );
 };

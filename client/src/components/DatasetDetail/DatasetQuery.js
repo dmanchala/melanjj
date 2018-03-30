@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Card, Button, Input, Form } from 'antd';
 import axios from 'axios';
+import request from 'request';
+import fs from 'fs';
 import * as actions from '../../actions';
+
+window.axios = axios;
 
 const { TextArea } = Input;
 
@@ -47,11 +51,9 @@ class DatasetQuery extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    const { err, res } = await axios.post('/api/queryDataset', {
-      query: this.state.query,
-    });
-    console.log(err);
-    console.log(res);
+    window.location = `${window.location.origin}\\api\\queryDataset?query=${
+      this.state.query
+    }`;
   }
 
   render() {

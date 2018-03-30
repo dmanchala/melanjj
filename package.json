@@ -9,13 +9,14 @@
   "scripts": {
     "start": "node index.js",
     "server": "nodemon index.js",
+    "server-debug": "nodemon --inspect=12345 index.js",
     "server-test": "mocha --timeout 10000 --exit",
     "client": "npm run start --prefix client",
     "client-test": "npm run test --prefix client",
     "kill-zombie": "lsof -t -i tcp:2000 | xargs kill",
-    "dev":
-      "npm run kill-zombie && concurrently --kill-others \"npm run server\" \"npm run client\"",
-    "test": "npm run kill-zombie && npm run server-test && npm run client-test"
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev-debug": "concurrently \"npm run server-debug\" \"npm run client\"",
+    "test": "npm run server-test && npm run client-test"
   },
   "repository": {
     "type": "git",
@@ -33,9 +34,12 @@
     "body-parser": "^1.18.2",
     "cookie-session": "^2.0.0-beta.3",
     "express": "^4.16.3",
-    "mongoose": "^5.0.11",
+    "fast-csv": "^2.4.1",
+    "fs": "0.0.1-security",
+    "mongoose": "^5.0.12",
     "passport": "^0.4.0",
-    "passport-google-oauth20": "^1.0.0"
+    "passport-google-oauth20": "^1.0.0",
+    "through2": "^2.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

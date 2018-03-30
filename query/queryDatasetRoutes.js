@@ -3,9 +3,9 @@ const queryDataset = require('./queryDataset');
 const getDataFromBigQuery = require('./getDataFromBigQuery');
 
 module.exports = (app) => {
-  app.post(
+  app.get(
     '/api/queryDataset',
-    requireLogin,
+    // requireLogin,
     queryDataset(getDataFromBigQuery),
   );
 };

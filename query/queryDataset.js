@@ -1,5 +1,24 @@
+/* eslint func-names: 0 */
+/* eslint space-before-function-paren: 0 */
+
+const BigQuery = require('@google-cloud/bigquery');
+const path = require('path');
+const through2 = require('through2');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const csv = require('fast-csv');
+const keys = require('../config/keys');
 const c = require('../full_stack/constants');
+
+const bigquery = new BigQuery({
+  projectId: keys.googleCloudProjectId,
+  keyFilename: path.resolve(
+    __dirname,
+    '..',
+    'config',
+    'melanjj-dev-c82a2fe5047c.json',
+  ),
+});
 
 const User = mongoose.model('users');
 /*
@@ -42,35 +61,99 @@ const User = mongoose.model('users');
     end response
     */
 
-module.exports = (getDataFromBigQuery) => async (req, res) => {
-  req.user.apiRequestsMadeToday += 1;
-  await req.user.save();
+module.exports = (getDataFromBigQuery) => async (req, res, next) => {
+  // req.user.apiRequestsMadeToday += 1;
+  // await req.user.save();
 
-  if (
-    req.user.bandwidthInBytesConsumedThisMonth >=
-    c.USER_MONTHLY_BANDWIDTH_QUOTA_IN_BYTES
-  ) {
-    res.status(403).send(c.errorStrings.BANDWIDTH_QUOTA_EXCEEDED);
-    return;
-  } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
-    res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
-    return;
-  } else if (!req.body.query) {
-    res.status(400).send(c.errorStrings.EMPTY_QUERY);
-    return;
-  }
+  // if (req.user.bytesProcessedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
+  //   res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
+  //   return;
+  // } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
+  //   res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
+  //   return;
+  // } else if (!req.body.query) {
+  //   res.status(400).send(c.errorStrings.EMPTY_QUERY);
+  //   return;
+  // }
 
-  getDataFromBigQuery(
-    req,
-    res,
-    (error) => {
-      res.status(error.code).send(error.message);
+  const { query } = req.query;
+
+  bigquery.createQueryJob(
+    {
+      query,
+      dryRun: true,
     },
-    (row) => {
-      console.log(row);
-    },
-    () => {
-      console.log('done');
+    async (dryRunErr, dryRunJob) => {
+      if (dryRunErr) {
+        console.log(dryRunErr);
+        res.status(dryRunErr.code).send({
+          reason: dryRunErr.errors[0].reason,
+          message: dryRunErr.message,
+        });
+        return;
+      }
+
+      // 'SELECT url FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
+
+      // const totalBytesProcessed = Number(
+      //   dryRunJob.metadata.statistics.query.totalBytesProcessed,
+      // );
+      // const user = await User.findById(req.user.id);
+
+      // if (
+      //   user.bytesProcessedThisMonth + totalBytesProcessed >
+      //   c.USER_MONTHLY_COMPUTE_BYTES_LIMIT
+      // ) {
+      //   res
+      //     .status(403)
+      //     .send(c.errorStrings.COMPUTE_BYTES_LIMIT_WOULD_BE_EXCEEDED);
+      //   return;
+      // }
+
+      // user.bytesProcessedThisMonth += totalBytesProcessed;
+      // await user.save();
+
+      res.setHeader('Content-disposition', 'inline;filename=res.csv');
+      res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+      res.flushHeaders();
+
+      const csvStream = csv.createWriteStream({ headers: true });
+      csvStream.pipe(fs.createWriteStream('test2.csv'));
+      // csvStream.pipe(res);
+
+      console.log('here');
+
+      let count = 0;
+
+      bigquery.query(query, { timeoutMs: 120000 }, (err, rows) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        console.log('here');
+
+        rows.forEach((row) => {
+          console.log(count, row);
+          count += 1;
+        });
+      });
+
+      // bigquery
+      //   .createQueryStream({
+      //     query,
+      //     timeoutMs: 1000,
+      //   })
+      //   .on('error', (queryErr) => {
+      //     console.log(queryErr);
+      //     res.status(queryErr.code).send(queryErr);
+      //   })
+      //   .on('data', (row) => {
+      //     csvStream.write(row);
+      //   })
+      //   .on('end', () => {
+      //     csvStream.end();
+      //   });
     },
   );
 };
