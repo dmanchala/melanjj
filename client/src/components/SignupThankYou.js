@@ -1,17 +1,9 @@
 import React from 'react';
-import { Layout } from 'antd';
-
-const { Content } = Layout;
+import { Card } from 'antd';
 
 const SignupThankYou = () => (
-  <Content style={{ padding: 50 }}>
-    <div
-      style={{
-        background: '#fff',
-        padding: 24,
-        textAlign: 'center',
-      }}
-    >
+  <Card>
+    <div style={{ textAlign: 'center' }}>
       <div style={{ fontSize: 64, fontWeight: 500 }}>
         That&apos;s it. You did it.
       </div>
@@ -20,7 +12,7 @@ const SignupThankYou = () => (
         activated.
       </div>
     </div>
-  </Content>
+  </Card>
 );
 
 export default SignupThankYou;
