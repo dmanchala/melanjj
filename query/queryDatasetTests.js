@@ -5,7 +5,7 @@
 
 process.env.NODE_ENV = 'test';
 
-const { describe, it, after } = require('mocha');
+const { describe, it } = require('mocha');
 const { expect } = require('chai');
 const MockExpressResponse = require('mock-express-response');
 const mongoose = require('mongoose');
@@ -17,13 +17,12 @@ const keys = require('../config/keys');
 mongoose.connect(keys.mongoUri);
 const User = mongoose.model('users');
 
-const userBandwidthQuotaExceeded = {
+const userComputeBytesLimitExceeded = {
   email: 'userBandwidthQuotaExceeded@gmail.com',
   approved: true,
   admin: false,
   dateCreated: new Date(),
-  bandwidthInBytesConsumedThisMonth:
-    c.USER_MONTHLY_BANDWIDTH_QUOTA_IN_BYTES + 1,
+  computeBytesUsedThisMonth: c.USER_MONTHLY_COMPUTE_BYTES_LIMIT + 1,
   apiRequestsMadeToday: 1,
 };
 
@@ -32,7 +31,7 @@ const userApiRequestLimitExceeded = {
   approved: true,
   admin: false,
   dateCreated: new Date(),
-  bandwidthInBytesConsumedThisMonth: 1,
+  computeBytesUsedThisMonth: 1,
   apiRequestsMadeToday: c.USER_DAILY_API_REQUEST_LIMIT + 1,
 };
 
@@ -41,7 +40,7 @@ const userValid1 = {
   approved: true,
   admin: false,
   dateCreated: new Date(),
-  bandwidthInBytesConsumedThisMonth: 0,
+  computeBytesUsedThisMonth: 0,
   apiRequestsMadeToday: 0,
 };
 
@@ -49,7 +48,7 @@ describe('datasetQuery', function() {
   before(async function() {
     await User.deleteMany({});
     await User.insertMany([
-      userBandwidthQuotaExceeded,
+      userComputeBytesLimitExceeded,
       userApiRequestLimitExceeded,
       userValid1,
     ]);
@@ -58,18 +57,18 @@ describe('datasetQuery', function() {
   describe('datasetQuery', function() {
     it('should reject a user who has exceeded her bandwidth quota', async function() {
       const req = {};
-      const { email } = userBandwidthQuotaExceeded;
+      const { email } = userComputeBytesLimitExceeded;
       req.user = await User.findOne({
         email,
       });
       const originalApiRequestCount = req.user.apiRequestsMadeToday;
       const res = new MockExpressResponse();
 
-      await queryDataset(() => {})(req, res);
+      await queryDataset(req, res);
 
       expect(res.statusCode).to.equal(403);
       expect(res._getString()).to.equal(
-        c.errorStrings.BANDWIDTH_QUOTA_EXCEEDED,
+        c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED,
       );
 
       const user = await User.findOne({ email });
@@ -85,7 +84,7 @@ describe('datasetQuery', function() {
       const originalApiRequestCount = req.user.apiRequestsMadeToday;
       const res = new MockExpressResponse();
 
-      await queryDataset(() => {})(req, res);
+      await queryDataset(req, res);
 
       expect(res.statusCode).to.equal(403);
       expect(res._getString()).to.equal(
@@ -98,7 +97,7 @@ describe('datasetQuery', function() {
 
     it('should reject an empty query', async function() {
       const req = {
-        body: { query: '' },
+        query: { query: '' },
       };
       const { email } = userValid1;
       req.user = await User.findOne({
@@ -107,37 +106,10 @@ describe('datasetQuery', function() {
       const originalApiRequestCount = req.user.apiRequestsMadeToday;
       const res = new MockExpressResponse();
 
-      await queryDataset(() => {})(req, res);
+      await queryDataset(req, res);
 
       expect(res.statusCode).to.equal(400);
       expect(res._getString()).to.equal(c.errorStrings.EMPTY_QUERY);
-
-      const user = await User.findOne({ email });
-      expect(user.apiRequestsMadeToday).to.equal(originalApiRequestCount + 1);
-    });
-
-    it('should return BigQuery error codes and messages', async function() {
-      const badQuery = 'Bad Query';
-      const req = {
-        body: { query: badQuery },
-      };
-      const { email } = userValid1;
-      req.user = await User.findOne({
-        email,
-      });
-      const originalApiRequestCount = req.user.apiRequestsMadeToday;
-      const res = new MockExpressResponse();
-      const bigQueryError = {
-        code: 400,
-        message: 'Syntax error: Unexpected identifier "Bad" at [1:1]',
-      };
-
-      await queryDataset((req, res, errorCallback) => {
-        errorCallback(bigQueryError);
-      })(req, res);
-
-      expect(res.statusCode).to.equal(400);
-      expect(res._getString()).to.equal(bigQueryError.message);
 
       const user = await User.findOne({ email });
       expect(user.apiRequestsMadeToday).to.equal(originalApiRequestCount + 1);

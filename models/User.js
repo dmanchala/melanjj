@@ -7,7 +7,7 @@ const userSchema = new Schema({
   approved: { type: Boolean, default: false },
   admin: { type: Boolean, default: false },
   dateCreated: { type: Date, default: new Date() },
-  bytesProcessedThisMonth: { type: Number, default: 0 },
+  computeBytesUsedThisMonth: { type: Number, default: 0 },
   apiRequestsMadeToday: { type: Number, default: 0 },
 });
 

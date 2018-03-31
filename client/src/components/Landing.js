@@ -20,14 +20,11 @@ const Landing = () => (
         }}
       >
         Use our query tool to quickly download the portions of big datasets you
-        want.
+        want. Get the million song dataset now.
       </div>
       <div>
         <Button type="primary" size="large" style={{ marginTop: 10 }}>
-          Explore The Million Song Dataset
-        </Button>
-        <Button size="large" style={{ marginLeft: 10, marginTop: 10 }}>
-          Request A Dataset
+          <a href="/auth/google">Sign Up</a>
         </Button>
       </div>
     </div>

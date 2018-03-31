@@ -61,20 +61,20 @@ const User = mongoose.model('users');
     end response
     */
 
-module.exports = (getDataFromBigQuery) => async (req, res, next) => {
-  // req.user.apiRequestsMadeToday += 1;
-  // await req.user.save();
+module.exports = async (req, res) => {
+  req.user.apiRequestsMadeToday += 1;
+  await req.user.save();
 
-  // if (req.user.bytesProcessedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
-  //   res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
-  //   return;
-  // } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
-  //   res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
-  //   return;
-  // } else if (!req.body.query) {
-  //   res.status(400).send(c.errorStrings.EMPTY_QUERY);
-  //   return;
-  // }
+  if (req.user.computeBytesUsedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
+    res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
+    return;
+  } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
+    res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
+    return;
+  } else if (!req.query.query) {
+    res.status(400).send(c.errorStrings.EMPTY_QUERY);
+    return;
+  }
 
   const { query } = req.query;
 
@@ -93,7 +93,7 @@ module.exports = (getDataFromBigQuery) => async (req, res, next) => {
         return;
       }
 
-      // 'SELECT url FROM `bigquery-public-data.samples.github_nested` LIMIT 10';
+      // 'SELECT mean_temp FROM `bigquery-public-data.samples.gsod` LIMIT 1000000';
 
       // const totalBytesProcessed = Number(
       //   dryRunJob.metadata.statistics.query.totalBytesProcessed,
@@ -125,7 +125,7 @@ module.exports = (getDataFromBigQuery) => async (req, res, next) => {
 
       let count = 0;
 
-      bigquery.query(query, { timeoutMs: 120000 }, (err, rows) => {
+      bigquery.query(query, { timeoutMs: 60000 }, (err, rows) => {
         if (err) {
           console.log(err);
           return;
@@ -138,22 +138,6 @@ module.exports = (getDataFromBigQuery) => async (req, res, next) => {
           count += 1;
         });
       });
-
-      // bigquery
-      //   .createQueryStream({
-      //     query,
-      //     timeoutMs: 1000,
-      //   })
-      //   .on('error', (queryErr) => {
-      //     console.log(queryErr);
-      //     res.status(queryErr.code).send(queryErr);
-      //   })
-      //   .on('data', (row) => {
-      //     csvStream.write(row);
-      //   })
-      //   .on('end', () => {
-      //     csvStream.end();
-      //   });
     },
   );
 };
