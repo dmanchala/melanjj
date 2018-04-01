@@ -1,11 +1,35 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Menu, Layout } from 'antd';
+import { Menu, Layout, Dropdown, Icon } from 'antd';
 
 const { Item } = Menu;
 
 class Header extends Component {
+  state = {
+    collapsed: true,
+  };
+
+  toggleCollapsed = () => {
+    this.setState({ collapsed: !this.state.collapsed });
+  };
+
+  menu() {
+    return (
+      <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
+        <Item key="1" style={{ fontSize: 'xx-large' }}>
+          <Link to="/">Melanjj</Link>
+        </Item>
+        <Item key="2">
+          <Link to="/datasets/melanjj/million-song-dataset">
+            Million Song Dataset
+          </Link>
+        </Item>
+        {this.renderAuthOptions()}
+      </Menu>
+    );
+  }
+
   renderAuthOptions() {
     switch (this.props.auth) {
       case null:
@@ -31,17 +55,15 @@ class Header extends Component {
   render() {
     return (
       <Layout.Header className="header">
-        <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
-          <Item key="1" style={{ fontSize: 'xx-large' }}>
-            <Link to="/">Melanjj</Link>
-          </Item>
-          <Item key="2">
-            <Link to="/datasets/melanjj/million-song-dataset">
-              Million Song Dataset
-            </Link>
-          </Item>
-          {this.renderAuthOptions()}
-        </Menu>
+        <Dropdown overlay={this.menu()} trigger={['click']}>
+          <a
+            className="ant-dropdown-link"
+            href="#"
+            onClick={this.toggleCollapsed}
+          >
+            <Icon type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} />
+          </a>
+        </Dropdown>
       </Layout.Header>
     );
   }
