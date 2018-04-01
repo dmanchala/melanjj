@@ -98,13 +98,13 @@ class DatasetGet extends Component {
     return (
       <div style={{ padding: 10 }}>
         <Row>
-          <Col style={{ padding: 1 }} xs={24} sm={24} md={8} l={8}>
+          <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
             <DatasetAbout dataset={this.dataset} />
           </Col>
-          <Col style={{ padding: 1 }} xs={24} sm={24} md={8} l={8}>
+          <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
             <DatasetQuery />
           </Col>
-          <Col style={{ padding: 1 }} xs={24} sm={24} md={8} l={8}>
+          <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
             <Card title="Help">
               <Card bordered={false}>How to use</Card>
               <Card title="Query syntax" bordered={false}>
