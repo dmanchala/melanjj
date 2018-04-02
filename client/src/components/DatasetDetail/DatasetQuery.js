@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Input, Form } from 'antd';
+import { Card, Button, Input, Form, Modal } from 'antd';
 import axios from 'axios';
-import request from 'request';
-import fs from 'fs';
 import * as actions from '../../actions';
 
 window.axios = axios;
 
 const { TextArea } = Input;
+const confirm = Modal.confirm;
 
 /* eslint react/prefer-stateless-function: 0 */
 
@@ -35,11 +34,11 @@ const AccountNotApprovedText = () => (
 class DatasetQuery extends Component {
   constructor(props) {
     super(props);
-    this.state = { query: '' };
-
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  state = { query: '' };
 
   componentDidMount() {
     this.props.fetchUser();
@@ -51,9 +50,17 @@ class DatasetQuery extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    window.location = `${window.location.origin}\\api\\queryDataset?query=${
-      this.state.query
-    }`;
+
+    await axios(
+      `${window.location.origin}/api/queryDataset?query=${this.state.query}`,
+    );
+
+    confirm({
+      title: 'Download query results?',
+      onOk() {
+        window.location = `${window.location.origin}/api/downloadDataset`;
+      },
+    });
   }
 
   render() {
@@ -64,6 +71,7 @@ class DatasetQuery extends Component {
         value={this.state.query}
         onChange={this.handleChange}
         disabled={!this.props.auth || !this.props.auth.approved}
+        defaultValue="SELECT title, duration FROM `melanjj-datasets-prod-199706.million_song_dataset.main` LIMIT"
       />
     );
     let content;
@@ -86,7 +94,9 @@ class DatasetQuery extends Component {
     }
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Card cover={textArea}>{content}</Card>
+        <Card title="Download" cover={textArea}>
+          {content}
+        </Card>
       </Form>
     );
   }

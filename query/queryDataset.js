@@ -61,9 +61,9 @@ const User = mongoose.model('users');
     end response
     */
 
-module.exports = async (req, res) => {
+module.exports.queryDataset = async (req, res) => {
   req.user.apiRequestsMadeToday += 1;
-  await req.user.save();
+  const user = await req.user.save();
 
   if (req.user.computeBytesUsedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
     res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
@@ -83,9 +83,8 @@ module.exports = async (req, res) => {
       query,
       dryRun: true,
     },
-    async (dryRunErr, dryRunJob) => {
+    async (dryRunErr) => {
       if (dryRunErr) {
-        console.log(dryRunErr);
         res.status(dryRunErr.code).send({
           reason: dryRunErr.errors[0].reason,
           message: dryRunErr.message,
@@ -93,7 +92,28 @@ module.exports = async (req, res) => {
         return;
       }
 
-      // 'SELECT mean_temp FROM `bigquery-public-data.samples.gsod` LIMIT 1000000';
+      bigquery
+        .createQueryJob({
+          query,
+          maximumBytesBilled:
+            c.USER_MONTHLY_COMPUTE_BYTES_LIMIT - user.bytesProcessedThisMonth,
+        })
+        .then((data) => {
+          const apiResponse = data[1];
+          const err = apiResponse.status.errorResult;
+
+          if (err) {
+            res.status(400).send(err);
+            return;
+          }
+
+          const job = data[0];
+          req.session.jobId = job.id;
+
+          res.status(200).end();
+        });
+
+      // 'SELECT title, duration FROM `melanjj-datasets-prod-199706.million_song_dataset.main` LIMIT 1000000';
 
       // const totalBytesProcessed = Number(
       //   dryRunJob.metadata.statistics.query.totalBytesProcessed,
@@ -113,31 +133,40 @@ module.exports = async (req, res) => {
       // user.bytesProcessedThisMonth += totalBytesProcessed;
       // await user.save();
 
-      res.setHeader('Content-disposition', 'inline;filename=res.csv');
-      res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
-      res.flushHeaders();
+      // res.setHeader('Content-disposition', 'inline;filename=res.csv');
+      // res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+      // res.flushHeaders();
 
-      const csvStream = csv.createWriteStream({ headers: true });
-      csvStream.pipe(fs.createWriteStream('test2.csv'));
+      // const csvStream = csv.createWriteStream({ headers: true });
       // csvStream.pipe(res);
 
-      console.log('here');
+      // bigquery.query(query, { timeoutMs: 60000 }, (err, rows) => {
+      //   if (err) {
+      //     console.log(err);
+      //     return;
+      //   }
 
-      let count = 0;
-
-      bigquery.query(query, { timeoutMs: 60000 }, (err, rows) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.log('here');
-
-        rows.forEach((row) => {
-          console.log(count, row);
-          count += 1;
-        });
-      });
+      //   rows.forEach((row) => {
+      //     csvStream.write(row);
+      //   });
+      // });
     },
   );
+};
+
+module.exports.downloadDataset = (req, res) => {
+  if (!req.session.jobId) {
+    res.status(404).end();
+  }
+
+  res.setHeader('Content-disposition', 'inline;filename=res.csv');
+  res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+  res.flushHeaders();
+
+  const csvStream = csv.createWriteStream({ headers: true });
+  csvStream.pipe(res);
+
+  const job = bigquery.job(req.session.jobId);
+  req.session.jobId = null;
+  job.getQueryResultsStream().pipe(csvStream);
 };
