@@ -7,7 +7,7 @@ import * as actions from '../../actions';
 window.axios = axios;
 
 const { TextArea } = Input;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 
 /* eslint react/prefer-stateless-function: 0 */
 
@@ -71,7 +71,6 @@ class DatasetQuery extends Component {
         value={this.state.query}
         onChange={this.handleChange}
         disabled={!this.props.auth || !this.props.auth.approved}
-        defaultValue="SELECT title, duration FROM `melanjj-datasets-prod-199706.million_song_dataset.main` LIMIT"
       />
     );
     let content;

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Card, Menu, Col, Row } from 'antd';
+import { Card, Menu, Col, Row, Dropdown, Icon, Table, Tooltip } from 'antd';
 import axios from 'axios';
-
 import DatasetQuery from './DatasetQuery';
+import ReactMarkdown from 'react-markdown';
 
 const menu = (
   <Menu>
@@ -23,16 +23,45 @@ const tabList = [
   },
 ];
 
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+    render: (text, record) => (
+      <Tooltip title={record.description}>
+        <div>{text}</div>
+      </Tooltip>
+    ),
+  },
+  {
+    title: 'Type',
+    dataIndex: 'type',
+    key: 'type',
+    align: 'left',
+    width: '33%',
+  },
+];
+
 class DatasetAbout extends Component {
   state = {
     activeKey: 'about',
     dataset: {},
+    activeCollectionIndex: null,
   };
 
   async componentWillMount() {
     const res = await axios.get(`/api/datasets/melanjj/${this.props.dataset}`);
-    this.setState({ dataset: res.data });
+    console.log(res.data.collections[0].columns);
+    this.setState({
+      dataset: res.data,
+      activeCollectionIndex: '0',
+    });
   }
+
+  onClickMenuItem = (e) => {
+    this.setState({ activeCollectionIndex: e.key });
+  };
 
   onTabChange = (key) => {
     this.setState({ activeKey: key });
@@ -42,18 +71,80 @@ class DatasetAbout extends Component {
     return this.state.activeKey === 'about' && !this.state.dataset.name;
   }
 
+  activeCollection() {
+    return this.state.dataset.collections[
+      Number(this.state.activeCollectionIndex)
+    ];
+  }
+
+  activeCollectionName() {
+    return this.activeCollection().name;
+  }
+
   renderAbout() {
     return [
       <Card key="0" loading={this.loading()} bordered={false}>
         <h2>{this.state.dataset.formattedName}</h2>
-        <div>{this.state.dataset.description}</div>
-        <p />
-        <h3>Citation</h3>
-        <div>{this.state.dataset.citation}</div>
-        <p />
-        <a href={this.state.dataset.source}>Source</a>
+        <ReactMarkdown source={this.state.dataset.description} />
       </Card>,
     ];
+  }
+
+  /* eslint react/no-array-index-key: 0 */
+  renderCollectionsMenu() {
+    if (this.loading()) {
+      return null;
+    }
+
+    return this.state.dataset.collections.map((collection, i) => (
+      <Menu.Item key={i}>{collection.name}</Menu.Item>
+    ));
+  }
+
+  renderCollections() {
+    const source = `${JSON.stringify(
+      this.activeCollection().columns,
+      null,
+      2,
+    )}`;
+
+    return (
+      <Card loading={this.loading()} bordered={false}>
+        <Dropdown
+          overlay={
+            <Menu
+              selectable
+              defaultSelectedKeys={[this.state.activeCollectionIndex]}
+              onClick={this.onClickMenuItem}
+            >
+              {this.renderCollectionsMenu()}
+            </Menu>
+          }
+        >
+          <div className="ant-dropdown-link">
+            {this.activeCollectionName()}
+            <Icon type="down" />
+          </div>
+        </Dropdown>
+        <p />
+        <ReactMarkdown source={this.activeCollection().description} />
+        <h2>Columns</h2>
+        <Table
+          dataSource={this.activeCollection().columns}
+          columns={columns}
+          size="small"
+          scroll={{ y: 400 }}
+          pagination={false}
+        />
+      </Card>
+    );
+  }
+
+  renderActiveTab() {
+    if (this.state.activeKey === 'about') {
+      return this.renderAbout();
+    }
+    return this.renderCollections();
   }
 
   render() {
@@ -66,25 +157,10 @@ class DatasetAbout extends Component {
           this.onTabChange(key);
         }}
       >
-        {this.renderAbout()}
+        {this.renderActiveTab()}
       </Card>
     );
   }
-  // <Card title="Collections">
-  //   <Card bordered={false}>
-  //     <Dropdown overlay={menu}>
-  //       <div className="ant-dropdown-link">
-  //         Collection Picker <Icon type="down" />
-  //       </div>
-  //     </Dropdown>
-  //   </Card>
-  //   <Card title="Summary" bordered={false}>
-  //     Summary
-  //   </Card>
-  //   <Card title="Columns" bordered={false}>
-  //     Columns
-  //   </Card>
-  // </Card>
 }
 
 /* eslint react/no-multi-comp: 0 */

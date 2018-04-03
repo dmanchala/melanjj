@@ -62,7 +62,7 @@ class Header extends Component {
           <Link to="/">Melanjj</Link>
         </Item>
         <Item key="2">
-          <Link to="/datasets/melanjj/million-song-dataset">
+          <Link to="/datasets/melanjj/million_song_dataset">
             Million Song Dataset
           </Link>
         </Item>

@@ -8,7 +8,6 @@ const datasetSchema = new Schema({
   formattedName: String,
   description: String,
   citation: String,
-  source: String,
   collections: [CollectionSchema],
 });
 
