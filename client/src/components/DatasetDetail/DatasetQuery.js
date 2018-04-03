@@ -7,7 +7,7 @@ import * as actions from '../../actions';
 window.axios = axios;
 
 const { TextArea } = Input;
-const { confirm } = Modal;
+const { confirm, error } = Modal;
 
 /* eslint react/prefer-stateless-function: 0 */
 
@@ -51,16 +51,24 @@ class DatasetQuery extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
 
-    await axios.post(`${window.location.origin}/api/queryDataset`, {
-      query: this.state.query,
-    });
+    try {
+      await axios.post(`${window.location.origin}/api/queryDataset`, {
+        query: this.state.query,
+      });
 
-    confirm({
-      title: 'Download query results?',
-      onOk() {
-        window.location = `${window.location.origin}/api/downloadDataset`;
-      },
-    });
+      confirm({
+        title: 'Download query results?',
+        onOk() {
+          window.location = `${window.location.origin}/api/downloadDataset`;
+        },
+      });
+    } catch ({ response: { data } }) {
+      console.log(data);
+      error({
+        title: data.reason || 'Error',
+        content: data.message,
+      });
+    }
   };
 
   handleKeyDown = async (e) => {

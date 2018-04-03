@@ -68,13 +68,17 @@ module.exports.queryDataset = async (req, res) => {
   const { query } = req.body;
 
   if (req.user.computeBytesUsedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
-    res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
+    res
+      .status(403)
+      .send({ message: c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED });
     return;
   } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
-    res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
+    res
+      .status(403)
+      .send({ message: c.errorStrings.API_REQUEST_LIMIT_EXCEEDED });
     return;
   } else if (!query) {
-    res.status(400).send(c.errorStrings.EMPTY_QUERY);
+    res.status(400).send({ message: c.errorStrings.EMPTY_QUERY });
     return;
   }
 
