@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  email: String,
+  email: { type: String, required: true },
   approved: { type: Boolean, default: false },
   admin: { type: Boolean, default: false },
   dateCreated: { type: Date, default: new Date() },
+  computeBytesUsedThisMonth: { type: Number, default: 0 },
+  apiRequestsMadeToday: { type: Number, default: 0 },
 });
 
 mongoose.model('users', userSchema);

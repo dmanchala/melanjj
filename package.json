@@ -8,11 +8,14 @@
   },
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon --inspect=12345 index.js",
-    "server-test": "mocha",
+    "server": "nodemon index.js",
+    "server-debug": "nodemon --inspect=12345 index.js",
+    "server-test": "mocha --timeout 10000 --exit",
     "client": "npm run start --prefix client",
     "client-test": "npm run test --prefix client",
+    "kill-zombie": "lsof -t -i tcp:2000 | xargs kill",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev-debug": "concurrently \"npm run server-debug\" \"npm run client\"",
     "test": "npm run server-test && npm run client-test"
   },
   "repository": {
@@ -26,17 +29,23 @@
   },
   "homepage": "https://github.com/dmanchala/melanjj#readme",
   "dependencies": {
+    "@google-cloud/bigquery": "^1.0.0",
     "@sendgrid/mail": "^6.2.1",
     "body-parser": "^1.18.2",
     "cookie-session": "^2.0.0-beta.3",
     "express": "^4.16.3",
-    "mongoose": "^5.0.11",
+    "fast-csv": "^2.4.1",
+    "fs": "0.0.1-security",
+    "mongoose": "^5.0.12",
     "passport": "^0.4.0",
-    "passport-google-oauth20": "^1.0.0"
+    "passport-google-oauth20": "^1.0.0",
+    "through2": "^2.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
     "babel-plugin-import": "^1.6.7",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
     "concurrently": "^3.5.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
@@ -44,6 +53,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "mocha": "^5.0.5",
+    "mock-express-response": "^0.2.2",
     "morgan": "^1.9.0",
     "nodemon": "^1.17.2"
   }

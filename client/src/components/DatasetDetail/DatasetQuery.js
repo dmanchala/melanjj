@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Input, Form } from 'antd';
+import { Card, Button, Input, Form, Modal } from 'antd';
 import axios from 'axios';
 import * as actions from '../../actions';
 
+window.axios = axios;
+
 const { TextArea } = Input;
+const { confirm, error } = Modal;
 
 /* eslint react/prefer-stateless-function: 0 */
 
@@ -31,11 +34,11 @@ const AccountNotApprovedText = () => (
 class DatasetQuery extends Component {
   constructor(props) {
     super(props);
-    this.state = { query: '' };
-
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  state = { query: '' };
 
   componentDidMount() {
     this.props.fetchUser();
@@ -45,19 +48,51 @@ class DatasetQuery extends Component {
     this.setState({ query: event.target.value });
   }
 
-  async handleSubmit(event) {
+  handleSubmit = async (event) => {
     event.preventDefault();
-    await axios.post('/api/graphql', { query: this.state.query });
-  }
+
+    try {
+      await axios.post(`${window.location.origin}/api/queryDataset`, {
+        query: this.state.query,
+      });
+
+      confirm({
+        title: 'Download query results?',
+        onOk() {
+          window.location = `${window.location.origin}/api/downloadDataset`;
+        },
+      });
+    } catch ({ response: { data } }) {
+      console.log(data);
+      error({
+        title: data.reason || 'Error',
+        content: data.message,
+      });
+    }
+  };
+
+  handleKeyDown = async (e) => {
+    if (e.keyCode !== 9) {
+      return;
+    }
+
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '    ');
+  };
 
   render() {
     const textArea = (
       <TextArea
         type="text"
-        rows={20}
         value={this.state.query}
+        onKeyDown={this.handleKeyDown}
         onChange={this.handleChange}
         disabled={!this.props.auth || !this.props.auth.approved}
+        autosize={{ minRows: 20 }}
+        style={{
+          fontFamily: 'monospace',
+          fontSize: 'large',
+        }}
       />
     );
     let content;
@@ -80,7 +115,9 @@ class DatasetQuery extends Component {
     }
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Card cover={textArea}>{content}</Card>
+        <Card title="Download" cover={textArea}>
+          {content}
+        </Card>
       </Form>
     );
   }

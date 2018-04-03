@@ -5,4 +5,5 @@ module.exports = {
   cookieKey: process.env.COOKIE_KEY,
   redirectDomain: process.env.REDIRECT_DOMAIN,
   sendgridKey: process.env.SENDGRID_KEY,
+  googleCloudProjectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
 };

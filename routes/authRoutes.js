@@ -20,7 +20,9 @@ module.exports = (app) => {
     passport.authenticate('google'),
     requireLogin,
     (req, res) => {
-      res.redirect(`${keys.redirectDomain}/`);
+      res.redirect(
+        `${keys.redirectDomain}/datasets/melanjj/million-song-dataset`,
+      );
     },
   );
 
@@ -31,12 +33,6 @@ module.exports = (app) => {
 
   app.get('/api/current_user', (req, res) => {
     res.send(req.user);
-  });
-
-  app.get('/signup-thank-you', (req, res) => {
-    res.send(
-      "Thank you for signing up. We'll email you when your account is ready.",
-    );
   });
 
   app.get('/api/admin/users/:id/approve', requireAdmin, async (req, res) => {
