@@ -5,14 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import * as strings from './helpAndExampleTextStrings';
 import DatasetQuery from './DatasetQuery';
 
-const menu = (
-  <Menu>
-    <Menu.Item key="0">1st menu item</Menu.Item>
-    <Menu.Item key="1">2nd menu item</Menu.Item>
-    <Menu.Item key="2">3rd menu item</Menu.Item>
-  </Menu>
-);
-
 const leftTabList = [
   {
     key: 'about',
