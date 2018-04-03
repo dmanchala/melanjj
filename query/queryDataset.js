@@ -65,26 +65,33 @@ module.exports.queryDataset = async (req, res) => {
   req.user.apiRequestsMadeToday += 1;
   const user = await req.user.save();
 
+  const { query } = req.body;
+
   if (req.user.computeBytesUsedThisMonth > c.USER_MONTHLY_COMPUTE_BYTES_LIMIT) {
     res.status(403).send(c.errorStrings.COMPUTE_BYTES_LIMIT_EXCEEDED);
     return;
   } else if (req.user.apiRequestsMadeToday >= c.USER_DAILY_API_REQUEST_LIMIT) {
     res.status(403).send(c.errorStrings.API_REQUEST_LIMIT_EXCEEDED);
     return;
-  } else if (!req.query.query) {
+  } else if (!query) {
     res.status(400).send(c.errorStrings.EMPTY_QUERY);
     return;
   }
 
-  const { query } = req.query;
+  const defaultDataset = {
+    datasetId: 'million_song_dataset',
+    projectId: 'melanjj-datasets-prod-199706',
+  };
 
   bigquery.createQueryJob(
     {
       query,
+      defaultDataset,
       dryRun: true,
     },
     async (dryRunErr) => {
       if (dryRunErr) {
+        console.log(query);
         res.status(dryRunErr.code).send({
           reason: dryRunErr.errors[0].reason,
           message: dryRunErr.message,
@@ -95,6 +102,7 @@ module.exports.queryDataset = async (req, res) => {
       bigquery
         .createQueryJob({
           query,
+          defaultDataset,
           maximumBytesBilled:
             c.USER_MONTHLY_COMPUTE_BYTES_LIMIT - user.bytesProcessedThisMonth,
         })

@@ -48,12 +48,12 @@ class DatasetQuery extends Component {
     this.setState({ query: event.target.value });
   }
 
-  async handleSubmit(event) {
+  handleSubmit = async (event) => {
     event.preventDefault();
 
-    await axios(
-      `${window.location.origin}/api/queryDataset?query=${this.state.query}`,
-    );
+    await axios.post(`${window.location.origin}/api/queryDataset`, {
+      query: this.state.query,
+    });
 
     confirm({
       title: 'Download query results?',
@@ -61,16 +61,30 @@ class DatasetQuery extends Component {
         window.location = `${window.location.origin}/api/downloadDataset`;
       },
     });
-  }
+  };
+
+  handleKeyDown = async (e) => {
+    if (e.keyCode !== 9) {
+      return;
+    }
+
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '    ');
+  };
 
   render() {
     const textArea = (
       <TextArea
         type="text"
-        rows={20}
         value={this.state.query}
+        onKeyDown={this.handleKeyDown}
         onChange={this.handleChange}
         disabled={!this.props.auth || !this.props.auth.approved}
+        autosize={{ minRows: 20 }}
+        style={{
+          fontFamily: 'monospace',
+          fontSize: 'large',
+        }}
       />
     );
     let content;

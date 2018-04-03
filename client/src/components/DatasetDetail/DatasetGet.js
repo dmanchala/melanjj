@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Card, Menu, Col, Row, Dropdown, Icon, Table, Tooltip } from 'antd';
 import axios from 'axios';
-import DatasetQuery from './DatasetQuery';
 import ReactMarkdown from 'react-markdown';
+import * as strings from './helpAndExampleTextStrings';
+import DatasetQuery from './DatasetQuery';
 
 const menu = (
   <Menu>
@@ -12,7 +13,7 @@ const menu = (
   </Menu>
 );
 
-const tabList = [
+const leftTabList = [
   {
     key: 'about',
     tab: 'About',
@@ -52,7 +53,6 @@ class DatasetAbout extends Component {
 
   async componentWillMount() {
     const res = await axios.get(`/api/datasets/melanjj/${this.props.dataset}`);
-    console.log(res.data.collections[0].columns);
     this.setState({
       dataset: res.data,
       activeCollectionIndex: '0',
@@ -82,11 +82,13 @@ class DatasetAbout extends Component {
   }
 
   renderAbout() {
+    if (this.loading()) {
+      return <Card key="0" loading={this.loading()} bordered={false} />;
+    }
+
     return [
-      <Card key="0" loading={this.loading()} bordered={false}>
-        <h2>{this.state.dataset.formattedName}</h2>
-        <ReactMarkdown source={this.state.dataset.description} />
-      </Card>,
+      <h2>{this.state.dataset.formattedName}</h2>,
+      <ReactMarkdown source={this.state.dataset.description} />,
     ];
   }
 
@@ -102,42 +104,38 @@ class DatasetAbout extends Component {
   }
 
   renderCollections() {
-    const source = `${JSON.stringify(
-      this.activeCollection().columns,
-      null,
-      2,
-    )}`;
+    if (this.loading()) {
+      return <Card key="0" loading={this.loading()} bordered={false} />;
+    }
 
-    return (
-      <Card loading={this.loading()} bordered={false}>
-        <Dropdown
-          overlay={
-            <Menu
-              selectable
-              defaultSelectedKeys={[this.state.activeCollectionIndex]}
-              onClick={this.onClickMenuItem}
-            >
-              {this.renderCollectionsMenu()}
-            </Menu>
-          }
-        >
-          <div className="ant-dropdown-link">
-            {this.activeCollectionName()}
-            <Icon type="down" />
-          </div>
-        </Dropdown>
-        <p />
-        <ReactMarkdown source={this.activeCollection().description} />
-        <h2>Columns</h2>
-        <Table
-          dataSource={this.activeCollection().columns}
-          columns={columns}
-          size="small"
-          scroll={{ y: 400 }}
-          pagination={false}
-        />
-      </Card>
-    );
+    return [
+      <Dropdown
+        overlay={
+          <Menu
+            selectable
+            defaultSelectedKeys={[this.state.activeCollectionIndex]}
+            onClick={this.onClickMenuItem}
+          >
+            {this.renderCollectionsMenu()}
+          </Menu>
+        }
+      >
+        <div className="ant-dropdown-link">
+          {this.activeCollectionName()}
+          <Icon type="down" />
+        </div>
+      </Dropdown>,
+      <p />,
+      <ReactMarkdown source={this.activeCollection().description} />,
+      <h2>Columns</h2>,
+      <Table
+        dataSource={this.activeCollection().columns}
+        columns={columns}
+        size="small"
+        scroll={{ y: 400 }}
+        pagination={false}
+      />,
+    ];
   }
 
   renderActiveTab() {
@@ -151,7 +149,58 @@ class DatasetAbout extends Component {
     return (
       <Card
         style={{ width: '100%', wordWrap: 'break-word' }}
-        tabList={tabList}
+        tabList={leftTabList}
+        activeTabKey={this.state.activeKey}
+        onTabChange={(key) => {
+          this.onTabChange(key);
+        }}
+      >
+        {this.renderActiveTab()}
+      </Card>
+    );
+  }
+}
+
+const rightTabList = [
+  {
+    key: 'help',
+    tab: 'Help',
+  },
+  {
+    key: 'examples',
+    tab: 'Examples',
+  },
+];
+
+class DatasetHelp extends Component {
+  static renderHelp() {
+    return <ReactMarkdown source={strings.helpText} />;
+  }
+
+  static renderExamples() {
+    return <ReactMarkdown source={strings.examplesText} />;
+  }
+
+  state = {
+    activeKey: 'help',
+  };
+
+  onTabChange = (key) => {
+    this.setState({ activeKey: key });
+  };
+
+  renderActiveTab() {
+    if (this.state.activeKey === 'help') {
+      return DatasetHelp.renderHelp();
+    }
+    return DatasetHelp.renderExamples();
+  }
+
+  render() {
+    return (
+      <Card
+        style={{ width: '100%', wordWrap: 'break-word' }}
+        tabList={rightTabList}
         activeTabKey={this.state.activeKey}
         onTabChange={(key) => {
           this.onTabChange(key);
@@ -181,15 +230,7 @@ class DatasetGet extends Component {
             <DatasetQuery />
           </Col>
           <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
-            <Card title="Help">
-              <Card bordered={false}>How to use</Card>
-              <Card title="Query syntax" bordered={false}>
-                Query syntax
-              </Card>
-              <Card title="Example query" bordered={false}>
-                Example query
-              </Card>
-            </Card>
+            <DatasetHelp />
           </Col>
         </Row>
       </div>
