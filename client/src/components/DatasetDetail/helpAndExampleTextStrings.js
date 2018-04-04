@@ -1,12 +1,12 @@
+import supportLink from '../../constants/constants';
+
 export const helpText = `Use the text area on the left to formulate a SQL query, and press \`Run\` below to receive the results in a CSV file. 
 
 This tool will execute any valid [BigQuery standard SQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax) query. Only the table name needs to be provided, not the dataset or project name. Refer to the Collections tab on the far left for a list of tables and columns. 
 
 Refer to the 'Examples' tab above for sample queries.
 
-We cap the number of bytes computed per user per month at 20GB. Please [reach out](\`${
-  window.location.origin
-}/slack\`) for more.
+We cap the number of bytes computed per user per month at 20GB. Please [reach out](${supportLink}) for more.
 
 **Note:** All columns of type array (\`[STRING]\`, \`[[FLOAT]]\`, etc.) are stored as strings of Python \`list\` literals. Use \`ast.literal_eval\` to convert them to the Python \`list\` type:
 
@@ -14,7 +14,7 @@ We cap the number of bytes computed per user per month at 20GB. Please [reach ou
     >>> ast.literal_eval("[1, 2, 3]")
     [1, 2, 3]
 
-Please [reach out](\`${window.location.origin}/slack\`) about anything!`;
+Please [reach out](${supportLink}) about anything!`;
 
 export const examplesText = `**Example #1:** 
 
