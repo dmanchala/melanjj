@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const keys = require('./config/keys');
 require('./models/User');
 require('./models/Dataset');
@@ -26,10 +27,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (process.env.NODE_ENV !== 'production') {
-  const morgan = require('morgan');
-  app.use(morgan('tiny'));
-}
+app.use(morgan('tiny'));
 
 require('./routes/authRoutes')(app);
 require('./query/datasetMetadataRoutes')(app);
