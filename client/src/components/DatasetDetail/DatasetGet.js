@@ -45,6 +45,7 @@ class DatasetAbout extends Component {
 
   async componentWillMount() {
     const res = await axios.get(`/api/datasets/melanjj/${this.props.dataset}`);
+    console.log(res);
     this.setState({
       dataset: res.data,
       activeCollectionIndex: '0',

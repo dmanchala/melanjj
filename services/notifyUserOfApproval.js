@@ -8,7 +8,7 @@ const emailHtmlTemplate = `
     <div>
       <a href=${
         keys.redirectDomain
-      }/datasets/melanjj/million-song-dataset>Start exploring datasets now.</a>
+      }/datasets/melanjj/million_song_dataset>Start exploring datasets now.</a>
     </div>
   </body>
 </html>
