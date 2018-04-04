@@ -46,6 +46,7 @@ jobs:
       - run: echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garb > ${HOME}/gcloud-service-key.json
       - run: apt-get install google-cloud-sdk
       - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+      - run: echo $BIGQUERY_SERVICE_ACCOUNT_KEY | base64 --decode --ignore-garb > ~/project/config/bigquery-service-account-key.json 
       - run: gcloud config set project melanjj-prod
       - run: gcloud app deploy
 workflows:

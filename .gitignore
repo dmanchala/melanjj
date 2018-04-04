@@ -3,3 +3,4 @@ config/dev.js
 .vscode/settings.json
 *.pyc
 .DS_Store
+config/melanjj-dev-c82a2fe5047c.json

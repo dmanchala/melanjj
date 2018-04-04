@@ -3,9 +3,6 @@
 
 const BigQuery = require('@google-cloud/bigquery');
 const path = require('path');
-const through2 = require('through2');
-const mongoose = require('mongoose');
-const fs = require('fs');
 const csv = require('fast-csv');
 const keys = require('../config/keys');
 const c = require('../full_stack/constants');
@@ -16,11 +13,10 @@ const bigquery = new BigQuery({
     __dirname,
     '..',
     'config',
-    'melanjj-dev-c82a2fe5047c.json',
+    'bigquery-service-account-key.json',
   ),
 });
 
-const User = mongoose.model('users');
 /*
     !!!! Database access must be read only !!!!
     !!!! Refactor so that BigQuery service can be mocked and the rest of the code can be unit tested !!!!
@@ -93,7 +89,7 @@ module.exports.queryDataset = async (req, res) => {
       defaultDataset,
       dryRun: true,
     },
-    async (dryRunErr) => {
+    async (dryRunErr, dryRunJob) => {
       if (dryRunErr) {
         console.log(query);
         res.status(dryRunErr.code).send({
@@ -103,12 +99,27 @@ module.exports.queryDataset = async (req, res) => {
         return;
       }
 
+      const totalBytesProcessed = Number(
+        dryRunJob.metadata.statistics.query.totalBytesProcessed,
+      );
+      const remainingComputeBytesBeforeJob = user.remainingComputeBytesThisMonth();
+
+      if (totalBytesProcessed > remainingComputeBytesBeforeJob) {
+        res.status(400).send({
+          message:
+            'The query exceeds your monthly compute bytes limit. Please try again.',
+        });
+        return;
+      }
+
+      user.computeBytesUsedThisMonth += totalBytesProcessed;
+      await user.save();
+
       bigquery
         .createQueryJob({
           query,
           defaultDataset,
-          maximumBytesBilled:
-            c.USER_MONTHLY_COMPUTE_BYTES_LIMIT - user.bytesProcessedThisMonth,
+          maximumBytesBilled: remainingComputeBytesBeforeJob,
         })
         .then((data) => {
           const apiResponse = data[1];
@@ -124,44 +135,6 @@ module.exports.queryDataset = async (req, res) => {
 
           res.status(200).end();
         });
-
-      // 'SELECT title, duration FROM `melanjj-datasets-prod-199706.million_song_dataset.main` LIMIT 1000000';
-
-      // const totalBytesProcessed = Number(
-      //   dryRunJob.metadata.statistics.query.totalBytesProcessed,
-      // );
-      // const user = await User.findById(req.user.id);
-
-      // if (
-      //   user.bytesProcessedThisMonth + totalBytesProcessed >
-      //   c.USER_MONTHLY_COMPUTE_BYTES_LIMIT
-      // ) {
-      //   res
-      //     .status(403)
-      //     .send(c.errorStrings.COMPUTE_BYTES_LIMIT_WOULD_BE_EXCEEDED);
-      //   return;
-      // }
-
-      // user.bytesProcessedThisMonth += totalBytesProcessed;
-      // await user.save();
-
-      // res.setHeader('Content-disposition', 'inline;filename=res.csv');
-      // res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
-      // res.flushHeaders();
-
-      // const csvStream = csv.createWriteStream({ headers: true });
-      // csvStream.pipe(res);
-
-      // bigquery.query(query, { timeoutMs: 60000 }, (err, rows) => {
-      //   if (err) {
-      //     console.log(err);
-      //     return;
-      //   }
-
-      //   rows.forEach((row) => {
-      //     csvStream.write(row);
-      //   });
-      // });
     },
   );
 };
