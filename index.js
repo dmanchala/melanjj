@@ -12,21 +12,19 @@ const app = express();
 
 app.use(bodyParser.json());
 
-if (process.env.NODE_ENV !== 'test') {
-  const cookieSession = require('cookie-session');
-  const passport = require('passport');
-  require('./services/passport');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
+require('./services/passport');
 
-  app.use(
-    cookieSession({
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      keys: [keys.cookieKey],
-    }),
-  );
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    keys: [keys.cookieKey],
+  }),
+);
 
-  app.use(passport.initialize());
-  app.use(passport.session());
-}
+app.use(passport.initialize());
+app.use(passport.session());
 
 if (process.env.NODE_ENV !== 'production') {
   const morgan = require('morgan');
