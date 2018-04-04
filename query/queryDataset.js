@@ -17,45 +17,8 @@ const bigquery = new BigQuery({
   ),
 });
 
-/*
-    !!!! Database access must be read only !!!!
-    !!!! Refactor so that BigQuery service can be mocked and the rest of the code can be unit tested !!!!
-    if user has exceeded their bandwidth quota, block them
-    if user has exceeded their API quota, block them
-    get dataset name
-    get collection name
-    initialize BigQuery
-    connect to collection table in dataset in BigQuery
-    get query
-    create a log object
-      write query to log object
-    make query
-      set timeout
-    write to log object
-    update user's API quota
-    if error:
-      write to log object
-      if invalid query:
-        notify user
-      if user attempts to write:
-        notify user
-      if some other error:
-        apologize
-      return
-    if job timed out:
-      write to log object
-      notify user
-      return
-    write to log object
-    calculate necessary bandwidth
-    if user will exceed their bandwidth quota, notify them and return
-    update user's bandwidth quota
-    initialize csv stream writer
-    set download content headers
-    stream results into csv writer
-    stream csv writer into response
-    end response
-    */
+const scrubProjectName = (string) =>
+  string.replace('melanjj-datasets-prod-199706', '');
 
 module.exports.queryDataset = async (req, res) => {
   req.user.apiRequestsMadeToday += 1;
@@ -91,10 +54,9 @@ module.exports.queryDataset = async (req, res) => {
     },
     async (dryRunErr, dryRunJob) => {
       if (dryRunErr) {
-        console.log(query);
         res.status(dryRunErr.code).send({
-          reason: dryRunErr.errors[0].reason,
-          message: dryRunErr.message,
+          reason: scrubProjectName(dryRunErr.errors[0].reason),
+          message: scrubProjectName(dryRunErr.message),
         });
         return;
       }
@@ -126,7 +88,7 @@ module.exports.queryDataset = async (req, res) => {
           const err = apiResponse.status.errorResult;
 
           if (err) {
-            res.status(400).send(err);
+            res.status(400).send(scrubProjectName(err));
             return;
           }
 

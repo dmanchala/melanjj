@@ -4,7 +4,7 @@ export const helpText = `Use the text area on the left to formulate a SQL query,
 
 This tool will execute any valid [BigQuery standard SQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax) query. Only the table name needs to be provided, not the dataset or project name. Refer to the Collections tab on the far left for a list of tables and columns. 
 
-Refer to the 'Examples' tab above for sample queries.
+Refer to the Examples tab above for sample queries.
 
 We cap the number of bytes computed per user per month at 20GB. Please [reach out](${supportLink}) for more.
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Menu, Layout, Dropdown, Icon, Button } from 'antd';
+import supportLink from '../constants/constants';
 
 const { Item } = Menu;
 
@@ -67,6 +68,9 @@ class Header extends Component {
           </Link>
         </Item>
         {this.renderAuthOptions()}
+        <Button ghost>
+          <a href={supportLink}>Feedback!</a>
+        </Button>
       </Menu>
     );
   }
