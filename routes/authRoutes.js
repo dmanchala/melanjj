@@ -21,7 +21,7 @@ module.exports = (app) => {
     requireLogin,
     (req, res) => {
       res.redirect(
-        `${keys.redirectDomain}/datasets/melanjj/million-song-dataset`,
+        `${keys.redirectDomain}/datasets/melanjj/million_song_dataset`,
       );
     },
   );

@@ -60,7 +60,7 @@ class DatasetAbout extends Component {
   };
 
   loading() {
-    return this.state.activeKey === 'about' && !this.state.dataset.name;
+    return !this.state.dataset.name;
   }
 
   activeCollection() {
