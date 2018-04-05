@@ -36,24 +36,105 @@ const columns = [
   },
 ];
 
-class DatasetAbout extends Component {
+class DatasetCollections extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      collections: props.collections,
+      activeCollectionKey: props.collections ? props.collections[0].name : null,
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.collections) {
+      this.setState({
+        collections: nextProps.collections,
+        activeCollectionKey: nextProps.collections[0].name,
+      });
+    }
+  }
+
+  loading() {
+    return this.state.activeCollectionKey === null;
+  }
+
+  activeCollection() {
+    return this.state.collections.filter(
+      ({ name }) => name === this.state.activeCollectionKey,
+    )[0];
+  }
+
+  activeCollectionName() {
+    return this.activeCollection().name;
+  }
+
+  renderCollectionsMenu() {
+    if (this.loading()) {
+      return null;
+    }
+
+    return this.state.collections.map((collection) => (
+      <Menu.Item key={collection.name}>{collection.name}</Menu.Item>
+    ));
+  }
+
+  render() {
+    if (this.loading()) {
+      return <Card loading={this.loading()} bordered={false} />;
+    }
+
+    return (
+      <div>
+        <Dropdown
+          overlay={
+            <Menu
+              selectable
+              defaultSelectedKeys={[this.state.activeCollectionKey]}
+              onClick={this.onClickMenuItem}
+            >
+              {this.renderCollectionsMenu()}
+            </Menu>
+          }
+        >
+          <div className="ant-dropdown-link">
+            {this.activeCollectionName()}
+            <Icon type="down" />
+          </div>
+        </Dropdown>
+        <p />
+        <ReactMarkdown source={this.activeCollection().description} />
+        <h2>Columns</h2>
+        <Table
+          dataSource={this.activeCollection().columns}
+          rowKey={(row) => row.name}
+          columns={columns}
+          size="small"
+          scroll={{ y: 400 }}
+          pagination={false}
+        />
+      </div>
+    );
+  }
+}
+
+class DatasetInfo extends Component {
   state = {
-    activeKey: 'about',
+    activeKey: 'collections',
     dataset: {},
-    activeCollectionIndex: null,
+    activeCollectionKey: null,
   };
 
   async componentWillMount() {
     const res = await axios.get(`/api/datasets/melanjj/${this.props.dataset}`);
-    console.log(res);
     this.setState({
       dataset: res.data,
-      activeCollectionIndex: '0',
+      activeCollectionKey: res.data.collections[0].name,
     });
   }
 
   onClickMenuItem = (e) => {
-    this.setState({ activeCollectionIndex: e.key });
+    this.setState({ activeCollectionKey: e.key });
   };
 
   onTabChange = (key) => {
@@ -64,78 +145,24 @@ class DatasetAbout extends Component {
     return !this.state.dataset.name;
   }
 
-  activeCollection() {
-    return this.state.dataset.collections[
-      Number(this.state.activeCollectionIndex)
-    ];
-  }
-
-  activeCollectionName() {
-    return this.activeCollection().name;
-  }
-
   renderAbout() {
     if (this.loading()) {
-      return <Card key="0" loading={this.loading()} bordered={false} />;
+      return <Card loading={this.loading()} bordered={false} />;
     }
 
-    return [
-      <h2>{this.state.dataset.formattedName}</h2>,
-      <ReactMarkdown source={this.state.dataset.description} />,
-    ];
-  }
-
-  /* eslint react/no-array-index-key: 0 */
-  renderCollectionsMenu() {
-    if (this.loading()) {
-      return null;
-    }
-
-    return this.state.dataset.collections.map((collection, i) => (
-      <Menu.Item key={i}>{collection.name}</Menu.Item>
-    ));
-  }
-
-  renderCollections() {
-    if (this.loading()) {
-      return <Card key="0" loading={this.loading()} bordered={false} />;
-    }
-
-    return [
-      <Dropdown
-        overlay={
-          <Menu
-            selectable
-            defaultSelectedKeys={[this.state.activeCollectionIndex]}
-            onClick={this.onClickMenuItem}
-          >
-            {this.renderCollectionsMenu()}
-          </Menu>
-        }
-      >
-        <div className="ant-dropdown-link">
-          {this.activeCollectionName()}
-          <Icon type="down" />
-        </div>
-      </Dropdown>,
-      <p />,
-      <ReactMarkdown source={this.activeCollection().description} />,
-      <h2>Columns</h2>,
-      <Table
-        dataSource={this.activeCollection().columns}
-        columns={columns}
-        size="small"
-        scroll={{ y: 400 }}
-        pagination={false}
-      />,
-    ];
+    return (
+      <div>
+        <h2>{this.state.dataset.formattedName}</h2>
+        <ReactMarkdown source={this.state.dataset.description} />
+      </div>
+    );
   }
 
   renderActiveTab() {
     if (this.state.activeKey === 'about') {
       return this.renderAbout();
     }
-    return this.renderCollections();
+    return <DatasetCollections collections={this.state.dataset.collections} />;
   }
 
   render() {
@@ -217,7 +244,7 @@ class DatasetGet extends Component {
       <div style={{ padding: 10 }}>
         <Row>
           <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
-            <DatasetAbout dataset={this.dataset} />
+            <DatasetInfo dataset={this.dataset} />
           </Col>
           <Col style={{ padding: 2 }} xs={24} sm={24} md={8} l={8}>
             <DatasetQuery />

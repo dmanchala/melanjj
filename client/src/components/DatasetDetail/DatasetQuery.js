@@ -4,26 +4,24 @@ import { Card, Button, Input, Form, Modal } from 'antd';
 import axios from 'axios';
 import * as actions from '../../actions';
 
-window.axios = axios;
-
 const { TextArea } = Input;
 const { confirm, error } = Modal;
 
-/* eslint react/prefer-stateless-function: 0 */
-
-const SignUpLogInContent = () => [
-  <div style={{ marginBottom: 10 }}>
-    Please sign up or log in to query this dataset.
-  </div>,
+const SignUpLogInContent = () => (
   <div>
-    <Button size="large">
-      <a href="/auth/google">Log In</a>
-    </Button>
-    <Button size="large" style={{ marginLeft: 10 }}>
-      <a href="/auth/google">Sign Up</a>
-    </Button>
-  </div>,
-];
+    <div style={{ marginBottom: 10 }}>
+      Please sign up or log in to query this dataset.
+    </div>
+    <div>
+      <Button size="large">
+        <a href="/auth/google">Log In</a>
+      </Button>
+      <Button size="large" style={{ marginLeft: 10 }}>
+        <a href="/auth/google">Sign Up</a>
+      </Button>
+    </div>
+  </div>
+);
 
 const AccountNotApprovedText = () => (
   <div>
@@ -63,7 +61,6 @@ class DatasetQuery extends Component {
         },
       });
     } catch ({ response: { data } }) {
-      console.log(data);
       error({
         title: data.reason || 'Error',
         content: data.message,
