@@ -29,10 +29,9 @@ app.use(passport.session());
 
 app.use(morgan('tiny'));
 
-require('./routes/authRoutes')(app);
+require('./auth/authRoutes')(app);
 require('./query/datasetMetadataRoutes')(app);
 require('./query/queryDatasetRoutes')(app);
-require('./query/graphqlRoutes')(app);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));
