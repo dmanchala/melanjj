@@ -1,12 +1,5 @@
 version: 2
 jobs:
-  test:
-    docker: 
-      - image: circleci/node:9.5.0
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm run test
   build-prod-react-app:
     docker:
       - image: circleci/node:9.5.0
@@ -51,9 +44,8 @@ jobs:
       - run: gcloud app deploy
 workflows:
   version: 2
-  test-and-deploy: 
+  build-and-deploy: 
     jobs:
-      - test
       - build-prod-react-app:
           filters:
             branches:
@@ -61,7 +53,6 @@ workflows:
                 - master
       - deploy:
           requires:
-            - test
             - build-prod-react-app
           filters:
             branches:
