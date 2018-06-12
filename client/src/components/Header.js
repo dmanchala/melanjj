@@ -68,7 +68,7 @@ class Header extends Component {
           </Link>
         </Item>
         {this.renderAuthOptions()}
-        <Item key="3">
+        <Item key="5">
           <a href={supportLink}>Feedback!</a>
         </Item>
       </Menu>
